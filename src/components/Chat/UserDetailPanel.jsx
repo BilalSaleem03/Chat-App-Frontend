@@ -76,7 +76,8 @@ const UserDetailPanel = ({ user, isMobile, onClose }) => {
         </svg>
       </button>
 
-      <div className="user-detail-panel__cover" />
+      {/* <div className="user-detail-panel__cover" /> */}
+      <img src="src/assets/user-detail-background.png" alt="" className="user-detail-panel__cover"/>
 
       <div className="user-detail-panel__body">
         {renderAvatar()}

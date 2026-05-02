@@ -107,7 +107,7 @@ const NewContactModal = ({ onClose, onSubmit }) => {
                 className="modal-panel__image-select"
                 onClick={() => fileRef.current && fileRef.current.click()}
               >
-                + Select
+                +   Select
               </span>
               <input
                 ref={fileRef}

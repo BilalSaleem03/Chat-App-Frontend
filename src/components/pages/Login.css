@@ -20,7 +20,7 @@
 .login__title {
   font-size: var(--fs-2xl, 1.5rem);
   font-weight: var(--fw-semibold, 600);
-  color: #0F172A;
+  color: var(--black-text-500);
   letter-spacing: -0.025em;
   text-align: center;
   line-height: 1.2;
@@ -38,15 +38,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-3, 0.75rem);
+  /* gap: var(--sp-3, 0.5rem); */
+  gap: 0.5rem;
   width: 100%;
   height: 44px;
-  border: 1.5px solid #E2E8F0;
-  border-radius: var(--radius-md, 8px);
-  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md, 10px);
+  /* background: #FFFFFF; */
   font-size: var(--fs-sm, 0.875rem);
   font-weight: var(--fw-medium, 500);
-  color: #0F172A;
+  color: var(--grey-grey-500);
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   transition: background var(--t-fast, 150ms ease), box-shadow var(--t-fast, 150ms ease);
   cursor: pointer;
@@ -68,6 +69,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3, 0.75rem);
+  margin: 3px 0px;
 }
 
 .login__divider-line {
@@ -104,14 +106,15 @@
 .login__label {
   font-size: var(--fs-sm, 0.875rem);
   font-weight: var(--fw-medium, 500);
-  color: #0F172A;
+  color: var(--grey-grey-500);
 }
 
 .login__forgot {
   font-size: var(--fs-sm, 0.875rem);
-  font-weight: var(--fw-medium, 500);
-  color: #2563EB;
+  font-weight: 600;
+  color: var(--color-primary);
   transition: color var(--t-fast, 150ms ease);
+  text-decoration: underline;
 }
 .login__forgot:hover {
   color: #1D4ED8;
@@ -131,9 +134,9 @@
   padding: 0 1rem;
   font-size: var(--fs-sm, 0.875rem);
   font-family: var(--font, 'DM Sans', sans-serif);
-  color: #0F172A;
+  color: var(--grey-grey-500);
   background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  border: 1px solid #E2E8F0;
   border-radius: var(--radius-md, 8px);
   transition: border-color var(--t-fast, 150ms ease), box-shadow var(--t-fast, 150ms ease);
   -webkit-appearance: none;
@@ -184,14 +187,14 @@
 /* ── Submit button ── */
 .login__submit-btn {
   width: 100%;
-  height: 44px;
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  height: 40px;
+  background: var( --color-primary);
   color: #FFFFFF;
   font-family: var(--font, 'DM Sans', sans-serif);
   font-size: var(--fs-sm, 0.875rem);
   font-weight: var(--fw-semibold, 600);
   border: none;
-  border-radius: var(--radius-md, 8px);
+  border-radius: 13px;
   box-shadow: 0 2px 8px rgba(37,99,235,0.30);
   cursor: pointer;
   transition: box-shadow var(--t-fast, 150ms ease), transform var(--t-fast, 150ms ease);
@@ -220,6 +223,7 @@
 
 /* ── Footer ── */
 .login__register-prompt {
+    margin-top: 13px;
   text-align: center;
   font-size: var(--fs-sm, 0.875rem);
   color: #64748B;
@@ -227,10 +231,11 @@
 
 .login__register-link {
   font-weight: var(--fw-semibold, 600);
-  color: #2563EB;
+  color: var(--color-primary);
   margin-left: 4px;
+text-decoration: underline;
 }
 .login__register-link:hover {
-  color: #1D4ED8;
+  color: var(--color-primary);
   text-decoration: underline;
 }

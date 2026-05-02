@@ -130,42 +130,53 @@ const NewGroupModal = ({ onClose, onSubmit }) => {
           {/* Members */}
           <div className="modal-panel__field">
             <span className="modal-panel__label">
-              Add Members {selected.length > 0 && <span style={{ color: '#2563EB' }}>({selected.length} selected)</span>}
+              Search & Add Members {selected.length > 0 && <span style={{ color: '#2563EB' }}>({selected.length} selected)</span>}
             </span>
-            <div className="modal-panel__search-wrap">
-              <svg className="modal-panel__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input
-                className="modal-panel__search-input"
-                placeholder="Search contacts..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-            </div>
-            <div className="modal-panel__member-list">
-              {fetching && <p className="modal-panel__hint">Loading contacts...</p>}
-              {!fetching && contacts.length === 0 && (
-                <p className="modal-panel__hint">No contacts yet. Add contacts first before creating a group.</p>
-              )}
-              {!fetching && filtered.map(member => (
-                <div key={member.id} className="modal-panel__member-item" onClick={() => toggleMember(member.id)}>
-                  <div className="modal-panel__member-avatar" style={{ background: getColor(member.name) }}>
-                    {getInitials(member.name)}
-                  </div>
-                  <div className="modal-panel__member-info">
-                    <div className="modal-panel__member-name">{member.name}</div>
-                    <div className="modal-panel__member-role">{member.email}</div>
-                  </div>
-                  <input
-                    type="checkbox"
-                    className="modal-panel__member-checkbox"
-                    checked={selected.includes(member.id)}
-                    onChange={() => toggleMember(member.id)}
-                    onClick={e => e.stopPropagation()}
+            <div className='model-panel__add-membsers-wraper'>
+              <div className="modal-panel__search-wrap">
+                <svg className="modal-panel__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  className="modal-panel__search-input"
+                  placeholder="Search contacts..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
                   />
-                </div>
-              ))}
+              </div>
+              <div className="modal-panel__member-list">
+                {fetching && <p className="modal-panel__hint">Loading contacts...</p>}
+                {!fetching && contacts.length === 0 && (
+                  <p className="modal-panel__hint">No contacts yet. Add contacts first before creating a group.</p>
+                )}
+                {!fetching && filtered.map(member => (
+                  <div key={member.id} className="modal-panel__member-item" onClick={() => toggleMember(member.id)}>
+                    {/* {
+                      
+                      (member.image)? <Avatar name={member.name} image={member.image} size={36} />
+                      :<div className="modal-panel__member-avatar" style={{ background: getColor(member.name) }}>
+                      {getInitials(member.name)}
+                    </div>
+                    } */}
+                    <div className="modal-panel__member-avatar" style={{ background: getColor(member.name) }}>
+                      {getInitials(member.name)}
+                    </div>
+                    
+                    
+                    <div className="modal-panel__member-info">
+                      <div className="modal-panel__member-name">{member.name}</div>
+                      <div className="modal-panel__member-role">{member.email}</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      className="modal-panel__member-checkbox"
+                      checked={selected.includes(member.id)}
+                      onChange={() => toggleMember(member.id)}
+                      onClick={e => e.stopPropagation()}
+                      />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

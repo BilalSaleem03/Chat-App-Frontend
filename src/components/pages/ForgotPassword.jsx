@@ -30,7 +30,7 @@ const ForgotPasswordForm = () => {
     <AuthLayout footer="© 2024 Made With ♥ By Sugab">
       <div className="forgot">
         <div>
-          <h1 className="forgot__title">Forgot Password?</h1>
+          <h1 className="forgot__title">Forgot Password</h1>
           <p className="forgot__subtitle">
             Enter the email address you used when joined and
             we'll send reset instructions to reset your password.

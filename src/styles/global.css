@@ -6,13 +6,20 @@
 
 /* ── Color tokens ── */
 :root {
-  --color-primary:           #2563EB;
+  --color-primary:           #0088FF;
+  --chat-hover: #0088FF;
   --color-primary-hover:     #1D4ED8;
   --color-primary-gradient:  linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
 
   --color-white:             #FFFFFF;
   --color-bg:                #F8FAFC;
   --color-border:            #E2E8F0;
+
+  --grey-grey-500: #727A90;
+  --grey-lght: #F1F2F4;
+  --soft-grey: #F8F8FC;
+  --black-text-500: #24282E;
+  --border-lines: #cbd0de;
 
   --color-text-primary:      #0F172A;
   --color-text-secondary:    #64748B;
@@ -77,6 +84,11 @@ html {
   -webkit-font-smoothing: antialiased;
   color-scheme: light;                   /* ← tells browser: light only */
   background-color: #FFFFFF;
+}
+
+#root {
+  max-width: 2000px;
+  margin: 0 auto;
 }
 
 body {
