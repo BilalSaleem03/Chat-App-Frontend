@@ -6,7 +6,7 @@ import ForgotPassword from './components/pages/ForgotPassword.jsx';
 import ResetPassword from './components/pages/ResetPassword.jsx';
 import Chat from './components/pages/Chat.jsx';
 import GoogleCallback from './components/pages/GoogleCallback.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
+import ProtectedRoute from './components/Protectedroute.jsx';
 
 
 function App() {
