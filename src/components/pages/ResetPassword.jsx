@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthLayout from '../Auth/AuthLayout.jsx';
 import './ForgotPassword.css';
+import eyeOff from "../../assets/eye-off.svg"
+import eye from "../../assets/eye.svg"
+
+
 const API = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 // console.log(API)
 
@@ -83,7 +87,7 @@ const ResetPassword = () => {
                 onClick={() => setShowPass(v => !v)}
               >
                 <img
-                  src={showPass ? '/src/assets/eye-off.svg' : '/src/assets/eye.svg'}
+                  src={showPass ? eyeOff : eye}
                   alt=""
                   aria-hidden="true"
                 />
@@ -111,7 +115,7 @@ const ResetPassword = () => {
                 onClick={() => setShowConf(v => !v)}
               >
                 <img
-                  src={showConf ? '/src/assets/eye-off.svg' : '/src/assets/eye.svg'}
+                  src={showConf ? eyeOff : eye}
                   alt=""
                   aria-hidden="true"
                 />

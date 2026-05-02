@@ -4,6 +4,9 @@ import axios from 'axios';
 import AuthLayout from '../Auth/AuthLayout.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import './Login.css';
+import google from "../../assets/google-icon.svg"
+import eyeOff from "../../assets/eye-off.svg"
+import eye from "../../assets/eye.svg"
 
 const API = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -68,7 +71,7 @@ const Login = () => {
           className="login__google-btn"
           onClick={() => { window.location.href = `${API}/users/google`; }}
         >
-          <img src="/src/assets/google-icon.svg" alt="" aria-hidden="true" />
+          <img src={google} alt="" aria-hidden="true" />
           Login with Google
         </button>
 
@@ -106,7 +109,7 @@ const Login = () => {
                 value={form.password} onChange={handleChange} autoComplete="current-password"
               />
               <button type="button" className="login__eye-btn" onClick={() => setShowPass(v => !v)}>
-                <img src={showPass ? '/src/assets/eye-off.svg' : '/src/assets/eye.svg'} alt="" aria-hidden="true" />
+                <img src={showPass ? eyeOff : eye} alt="" aria-hidden="true" />
               </button>
             </div>
             {errors.password && <span className="login__error-msg">{errors.password}</span>}

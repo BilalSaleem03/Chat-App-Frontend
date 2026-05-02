@@ -4,6 +4,9 @@ import axios from 'axios';
 import AuthLayout from '../Auth/AuthLayout.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import './Register.css';
+import google from "../../assets/google-icon.svg"
+import eyeOff from "../../assets/eye-off.svg"
+import eye from "../../assets/eye.svg"
 
 const API = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -70,7 +73,7 @@ const Register = () => {
           className="register__google-btn"
           onClick={() => { window.location.href = `${API}/users/google`; }}
         >
-          <img src="/src/assets/google-icon.svg" alt="" aria-hidden="true" />
+          <img src={google} alt="" aria-hidden="true" />
           Register with Google
         </button>
 
@@ -129,7 +132,7 @@ const Register = () => {
                 value={form.password} onChange={handleChange} autoComplete="new-password"
               />
               <button type="button" className="register__eye-btn" onClick={() => setShowPass(v => !v)}>
-                <img src={showPass ? '/src/assets/eye-off.svg' : '/src/assets/eye.svg'} alt="" aria-hidden="true" />
+                <img src={showPass ? eyeOff : eye} alt="" aria-hidden="true" />
               </button>
             </div>
             {errors.password && <span className="register__error-msg">{errors.password}</span>}

@@ -7,6 +7,13 @@ import NewContactModal from '../Chat/NewContactModal.jsx';
 import NewGroupModal from '../Chat/NewGroupModal.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import './Chat.css';
+import navbarLeft from '../../assets/navbar-left-icon.svg'
+import navbarMessage from '../../assets/navbar-message.svg'
+import navbarRing from '../../assets/navbar-ring.svg'
+import navbarLanguage from '../../assets/navbar-language.png'
+import sidebarDrop from '../../assets/sidebar-product-down-arrow.png'
+import search from '../../assets/search.svg'
+
 
 const API    = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';;
 const COLORS = ['#6366F1','#EC4899','#F59E0B','#10B981','#3B82F6','#8B5CF6','#EF4444','#14B8A6'];
@@ -299,26 +306,26 @@ const Chat = () => {
               {/* <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg> */}
-              <img src='src/assets/navbar-left-icon.svg' alt='Left Icon' style={{width: '24px', height: '24px'}} />
+              <img src={navbarLeft} alt='Left Icon' style={{width: '24px', height: '24px'}} />
             </button>
             <button className="chat-navbar__icon-btn" aria-label="Tasks">
               {/* <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg> */}
-              <img src='src/assets/navbar-message.svg' alt='Message Icon' style={{width: '24px', height: '24px'}} />
+              <img src={navbarMessage} alt='Message Icon' style={{width: '24px', height: '24px'}} />
             </button>
             <button className="chat-navbar__icon-btn" aria-label="Notifications">
               {/* <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg> */}
-              <img src='src/assets/navbar-ring.svg' alt='Ring Icon' style={{width: '24px', height: '24px'}} />
+              <img src={navbarRing} alt='Ring Icon' style={{width: '24px', height: '24px'}} />
             </button>
             <button className="chat-navbar__icon-btn" aria-label="Language">
               {/* <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
               </svg> */}
-              <img src='src/assets/navbar-language.png' alt='Language Icon' style={{width: '24px', height: '24px'}} />
+              <img src={navbarLanguage} alt='Language Icon' style={{width: '24px', height: '24px'}} />
             </button>
             <button className="chat-navbar__add-btn" onClick={() => setShowNewContact(true)} aria-label="Add contact">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -340,7 +347,7 @@ const Chat = () => {
               {/* <svg className="chat-navbar__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
               </svg> */}
-              <img style={{height:'18px' , width: '18px'}} className="sidebar__nav-icon" src="/src/assets/sidebar-product-down-arrow.png" alt="Product Icon" />
+              <img style={{height:'18px' , width: '18px'}} className="sidebar__nav-icon" src={sidebarDrop} alt="Product Icon" />
             </button>
           </div>
         </header>
@@ -361,7 +368,7 @@ const Chat = () => {
                   {/* <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="13" cy="11" r="8.5"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                   </svg> */}
-                  <img src='src/assets/search.svg' alt='Search Icon' style={{width: '17px', height: '17px'}} />
+                  <img src={search} alt='Search Icon' style={{width: '17px', height: '17px'}} />
                 </button>
               </div>
               <div className="chat-list-panel__tabs">
