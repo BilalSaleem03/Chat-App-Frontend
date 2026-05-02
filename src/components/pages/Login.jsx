@@ -5,7 +5,7 @@ import AuthLayout from '../Auth/AuthLayout.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import './Login.css';
 
-const API = 'http://localhost:5000';
+const API = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const Login = () => {
   const { saveUser }            = useAuth();

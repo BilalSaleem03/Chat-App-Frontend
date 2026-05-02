@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './ModalPanel.css';
 
-const API    = 'http://localhost:5000';
+const API    = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';;
 const COLORS = ['#6366F1','#EC4899','#F59E0B','#10B981','#3B82F6','#8B5CF6','#EF4444','#14B8A6'];
 const getInitials = (name) => name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
 const getColor    = (name) => COLORS[(name?.charCodeAt(0) || 0) % COLORS.length];

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import './ModalPanel.css';
 
-const API = 'http://localhost:5000';
+const API = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const NewContactModal = ({ onClose, onSubmit }) => {
   const [email,     setEmail]     = useState('');
