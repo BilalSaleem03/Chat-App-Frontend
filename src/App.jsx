@@ -8,6 +8,7 @@ import Chat from './components/pages/Chat.jsx';
 import GoogleCallback from './components/pages/GoogleCallback.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
+
 function App() {
   return (
     <BrowserRouter>
