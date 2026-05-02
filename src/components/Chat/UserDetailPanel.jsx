@@ -1,37 +1,70 @@
 import React from 'react';
 import './UserDetailPanel.css';
 
-const getInitials = (name) =>
-  name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+const COLORS = ['#6366F1','#EC4899','#F59E0B','#10B981','#3B82F6','#8B5CF6','#EF4444','#14B8A6'];
+const getInitials = (name) => name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+const getColor    = (name) => COLORS[(name?.charCodeAt(0) || 0) % COLORS.length];
 
 const UserDetailPanel = ({ user, isMobile, onClose }) => {
   if (!user) return null;
 
-  const info = user.isCurrentUser
-    ? [
-        { label: 'Email',        value: 'johnwill@mail.com' },
-        { label: 'Phone Number', value: '+1 234 567 8900' },
-        { label: 'Location',     value: 'New York, USA' },
-        { label: 'Birthday',     value: '12 May 1990' },
-        { label: 'Join Date',    value: '01 January 2023' },
-      ]
-    : [
-        { label: 'Email',        value: `${user.name.split(' ')[0].toLowerCase()}@mail.com` },
-        { label: 'Phone Number', value: '050 414 8778' },
-        { label: 'Location',     value: 'New York, USA' },
-        { label: 'Birthday',     value: '12 May 1992' },
-        { label: 'Join Date',    value: '12 December 2023' },
+  // Build info rows depending on whether it's a group, contact, or current user
+  const buildInfo = () => {
+    if (user.isGroup) {
+      return [
+        { label: 'Description', value: user.description || '—' },
+        { label: 'Members',     value: `${user.members?.length || 0} members` },
       ];
+    }
+    if (user.isCurrentUser) {
+      return [
+        { label: 'Email',        value: user.email    || '—' },
+        { label: 'Username',     value: user.username ? `@${user.username}` : '—' },
+      ];
+    }
+    // Contact
+    return [
+      { label: 'Email',    value: user.email    || '—' },
+      { label: 'Username', value: user.username ? `@${user.username}` : '—' },
+    ];
+  };
 
+  const info = buildInfo();
+
+  // Determine if we should show as fixed drawer (tablet/mobile)
   const className = [
     'user-detail-panel',
     isMobile ? 'user-detail-panel--open' : '',
   ].filter(Boolean).join(' ');
 
+  // Avatar: show image if available, otherwise colored initials
+  const renderAvatar = () => {
+    if (user.image) {
+      return (
+        <img
+          className="user-detail-panel__avatar"
+          src={user.image}
+          alt={user.name}
+        />
+      );
+    }
+    return (
+      <div
+        className="user-detail-panel__avatar"
+        style={{ background: getColor(user.name) }}
+      >
+        {getInitials(user.name)}
+      </div>
+    );
+  };
+
+  const statusLabel = user.isGroup
+    ? `${user.members?.length || 0} members`
+    : user.isCurrentUser ? 'You' : 'Contact';
+
   return (
     <div className={className}>
 
-      {/* Close button — always visible top-right */}
       <button
         className="user-detail-panel__close"
         onClick={onClose}
@@ -44,16 +77,14 @@ const UserDetailPanel = ({ user, isMobile, onClose }) => {
       </button>
 
       <div className="user-detail-panel__cover" />
+
       <div className="user-detail-panel__body">
-        <div
-          className="user-detail-panel__avatar"
-          style={{ background: user.color || '#6366F1' }}
-        >
-          {getInitials(user.name)}
-        </div>
+        {renderAvatar()}
         <div className="user-detail-panel__name">{user.name}</div>
-        <span className="user-detail-panel__status-badge">Online</span>
+        <span className="user-detail-panel__status-badge">{statusLabel}</span>
+
         <div className="user-detail-panel__divider" />
+
         <div className="user-detail-panel__info">
           {info.map(item => (
             <div key={item.label} className="user-detail-panel__info-item">
@@ -63,6 +94,7 @@ const UserDetailPanel = ({ user, isMobile, onClose }) => {
           ))}
         </div>
       </div>
+
     </div>
   );
 };

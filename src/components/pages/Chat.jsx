@@ -1,80 +1,256 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { io } from 'socket.io-client';
 import Sidebar from '../Chat/Sidebar.jsx';
 import UserDetailPanel from '../Chat/UserDetailPanel.jsx';
 import NewContactModal from '../Chat/NewContactModal.jsx';
 import NewGroupModal from '../Chat/NewGroupModal.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import './Chat.css';
 
-const CONTACTS = [
-  { id: 1, name: 'Jack Tompshon', online: true,  color: '#6366F1' },
-  { id: 2, name: 'Peg Legge',     online: false, color: '#EC4899' },
-  { id: 3, name: 'Rita Bock',     online: true,  color: '#F59E0B' },
-  { id: 4, name: 'Lucas Graham',  online: false, color: '#10B981' },
-  { id: 5, name: 'Phil Turner',   online: true,  color: '#3B82F6' },
-  { id: 6, name: 'Anna Teak',     online: false, color: '#8B5CF6' },
-  { id: 7, name: 'Joyce Kim',     online: true,  color: '#EF4444' },
-  { id: 8, name: 'Laura Prichet', online: false, color: '#14B8A6' },
-];
+const API    = 'http://localhost:5000';
+const COLORS = ['#6366F1','#EC4899','#F59E0B','#10B981','#3B82F6','#8B5CF6','#EF4444','#14B8A6'];
 
-const GROUPS = [
-  { id: 101, name: 'Project Alpha', initials: 'PA', color: '#6366F1', isGroup: true },
-  { id: 102, name: 'Tech Team',     initials: 'TM', color: '#F59E0B', isGroup: true },
-  { id: 103, name: 'Team AI',       initials: 'AI', color: '#10B981', isGroup: true },
-  { id: 104, name: 'Team Group',    initials: 'TG', color: '#3B82F6', isGroup: true },
-];
+const getInitials  = (name) => name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+const getColor     = (name) => COLORS[(name?.charCodeAt(0) || 0) % COLORS.length];
 
-const MESSAGES = [
-  { id: 1, sent: false, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac augue eu odio tempor commodo. Nullam ut mattis eros. Cras ut orci nisi.', time: '1 day ago' },
-  { id: 2, sent: true,  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac augue eu odio tempor commodo. Nullam ut mattis eros. Cras ut orci nisi.', time: '1 day ago' },
-  { id: 3, sent: false, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac augue eu odio tempor commodo. Nullam ut mattis eros. Cras ut orci nisi.', time: '1 day ago' },
-  { id: 4, sent: true,  text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac augue eu odio tempor commodo. Nullam ut mattis eros. Cras ut orci nisi.', time: '1 day ago' },
-  { id: 5, sent: false, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac augue eu odio tempor commodo. Nullam ut mattis eros. Cras ut orci nisi.', time: '1 day ago' },
-  { id: 6, sent: true,  text: 'Lorem ipsum dolor sit amet', time: '1 day ago' },
-];
-
-const CURRENT_USER = { id: 0, name: 'John Will Palinsky', color: '#6366F1', isCurrentUser: true };
-const getInitials  = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+// Renders image if available, otherwise colored initials circle
+const Avatar = ({ name, image, size = 36, className = '' }) => {
+  const style = { width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover' };
+  if (image) {
+    return <img src={image} alt={name} style={style} className={className} />;
+  }
+  return (
+    <div style={{ ...style, background: getColor(name), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.28 + 'px', fontWeight: 700, color: '#fff' }} className={className}>
+      {getInitials(name)}
+    </div>
+  );
+};
+const formatTime   = (dateStr) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffMs  = now - d;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHrs = Math.floor(diffMs / 3600000);
+  const diffDay = Math.floor(diffMs / 86400000);
+  if (diffMin < 1)  return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  if (diffDay < 7)  return `${diffDay}d ago`;
+  return d.toLocaleDateString();
+};
 
 const Chat = () => {
+  const { user: authUser, accessToken } = useAuth();
+
+  const CURRENT_USER = {
+    id:            authUser?.id,
+    name:          authUser?.name     || 'You',
+    username:      authUser?.username || '',
+    email:         authUser?.email    || '',
+    color:         getColor(authUser?.name),
+    isCurrentUser: true,
+  };
+
+  // ── State ──────────────────────────────────────────────────
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [chatListOpen,     setChatListOpen]     = useState(false);
   const [isMobile,         setIsMobile]         = useState(false);
+  const [panelDrawer,      setPanelDrawer]      = useState(window.innerWidth <= 1100);
   const [activeTab,        setActiveTab]        = useState('chats');
-  const [activeContact,    setActiveContact]    = useState(CONTACTS[0]);
+
+  const [conversations,    setConversations]    = useState([]);   // all from API
+  const [activeConv,       setActiveConv]       = useState(null); // selected conversation
+  const [messages,         setMessages]         = useState([]);   // messages for activeConv
+  const [messageInput,     setMessageInput]     = useState('');
+
   const [detailUser,       setDetailUser]       = useState(null);
   const [showNewContact,   setShowNewContact]   = useState(false);
   const [showNewGroup,     setShowNewGroup]     = useState(false);
-  const [messageInput,     setMessageInput]     = useState('');
 
+  const [convsLoading,     setConvsLoading]     = useState(true);
+  const [msgsLoading,      setMsgsLoading]      = useState(false);
+  const [convsError,       setConvsError]       = useState('');
+
+  const socketRef      = useRef(null);
+  const messagesEndRef = useRef(null);
+  const activeConvRef  = useRef(null); // always holds current activeConv.conversationId
+
+  // ── Responsive ─────────────────────────────────────────────
   useEffect(() => {
     const handleResize = () => {
       const w = window.innerWidth;
-      const mobile = w <= 680;
-      setIsMobile(mobile);
+      setIsMobile(w <= 680);
+      setPanelDrawer(w <= 1100);
       setSidebarCollapsed(w <= 900);
-      // Close drawers on resize to desktop
-      if (!mobile) { setChatListOpen(false); }
+      if (w > 680)  setChatListOpen(false);
+      if (w > 1100) setDetailUser(null);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // ── Fetch conversations on mount ───────────────────────────
+  useEffect(() => {
+    const fetchConversations = async () => {
+      setConvsLoading(true);
+      setConvsError('');
+      try {
+        const res = await axios.get(`${API}/chat/conversations`, { withCredentials: true });
+        setConversations(res.data);
+      } catch (err) {
+        setConvsError(err.response?.data?.error || 'Failed to load conversations.');
+      } finally {
+        setConvsLoading(false);
+      }
+    };
+    fetchConversations();
+  }, []);
+
+  // ── Socket.IO setup ────────────────────────────────────────
+  useEffect(() => {
+    if (!accessToken) return;
+
+    // Disconnect any existing socket before creating a new one
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+
+    const socket = io(API, {
+      path: '/socket.io/',
+      withCredentials: true,
+      auth: { token: accessToken },
+    });
+    socketRef.current = socket;
+
+    socket.on('receive_message', (newMsg) => {
+      setMessages(prev => {
+        const alreadyExists = prev.some(m => m._id === newMsg._id);
+        if (alreadyExists) return prev;
+        return [...prev, newMsg];
+      });
+    });
+
+    // Join personal room for unread badge updates
+    socket.emit('join_user_room');
+
+    socket.on('unread_updated', ({ conversationId }) => {
+      const isViewing = activeConvRef.current === conversationId.toString();
+
+      if (isViewing) {
+        // User is looking at this chat right now — mark read, no badge
+        axios.patch(
+          `${API}/chat/conversations/${conversationId}/read`,
+          {},
+          { withCredentials: true }
+        ).catch(() => {});
+        return;
+      }
+
+      // User is not viewing this chat — show the badge
+      setConversations(prev =>
+        prev.map(c =>
+          c.conversationId.toString() === conversationId.toString()
+            ? { ...c, unreadCount: (c.unreadCount || 0) + 1 }
+            : c
+        )
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [accessToken]);
+
+  // ── Join room when active conversation changes ─────────────
+  useEffect(() => {
+    if (!activeConv) return;
+    activeConvRef.current = activeConv.conversationId.toString();
+    socketRef.current?.emit('join_room', activeConv.conversationId);
+  }, [activeConv]);
+
+  // ── Fetch messages when conversation selected ──────────────
+  useEffect(() => {
+    if (!activeConv) return;
+    const fetchMessages = async () => {
+      setMsgsLoading(true);
+      setMessages([]);
+      try {
+        const res = await axios.get(
+          `${API}/messages/messages/${activeConv.conversationId}`,
+          { withCredentials: true }
+        );
+        setMessages(res.data);
+      } catch (err) {
+        console.error('Failed to load messages:', err);
+      } finally {
+        setMsgsLoading(false);
+      }
+    };
+    fetchMessages();
+  }, [activeConv]);
+
+  // ── Scroll to bottom when messages change ─────────────────
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // ── Handlers ───────────────────────────────────────────────
+  const handleConvClick = (conv) => {
+    setActiveConv(conv);
+    setDetailUser(prev =>
+      prev && !prev.isCurrentUser && prev.id === conv.conversationId ? null : conv
+    );
+    if (isMobile) setChatListOpen(false);
+
+    // Reset unread badge locally immediately
+    if (conv.unreadCount > 0) {
+      setConversations(prev =>
+        prev.map(c =>
+          c.conversationId.toString() === conv.conversationId.toString()
+            ? { ...c, unreadCount: 0 }
+            : c
+        )
+      );
+      // Tell backend to reset count in DB
+      axios.patch(
+        `${API}/chat/conversations/${conv.conversationId}/read`,
+        {},
+        { withCredentials: true }
+      ).catch(() => {});
+    }
+  };
+
   const handleProfileClick = () => {
     setDetailUser(prev => prev?.isCurrentUser ? null : { ...CURRENT_USER });
   };
 
-  const handleContactClick = (contact) => {
-    setActiveContact(contact);
-    setDetailUser(prev =>
-      prev && !prev.isCurrentUser && prev.id === contact.id ? null : { ...contact }
-    );
-    if (isMobile) setChatListOpen(false);
+  const handleSend = () => {
+    if (!messageInput.trim() || !activeConv) return;
+    socketRef.current?.emit('send_message', {
+      conversationId: activeConv.conversationId,
+      text: messageInput.trim(),
+    });
+    setMessageInput('');
   };
 
-  const handleSend = () => {
-    if (!messageInput.trim()) return;
-    setMessageInput('');
+  const handleNewContact = async (data) => {
+    // Refresh conversations after creating a contact
+    try {
+      const res = await axios.get(`${API}/chat/conversations`, { withCredentials: true });
+      setConversations(res.data);
+    } catch {}
+  };
+
+  const handleNewGroup = async (data) => {
+    try {
+      const res = await axios.get(`${API}/chat/conversations`, { withCredentials: true });
+      setConversations(res.data);
+    } catch {}
   };
 
   const closeAllDrawers = () => {
@@ -82,9 +258,23 @@ const Chat = () => {
     setDetailUser(null);
   };
 
-  const list = activeTab === 'chats' ? CONTACTS : GROUPS;
-  const showOverlay = isMobile && (chatListOpen || !!detailUser);
+  // ── Split conversations into chats vs groups ───────────────
+  const chats  = conversations.filter(c => !c.isGroup);
+  const groups = conversations.filter(c =>  c.isGroup);
+  const list   = activeTab === 'chats' ? chats : groups;
 
+  // Map userId → image from direct conversations
+  // Used to show correct avatar in group messages
+  const senderImageMap = {};
+  chats.forEach(c => {
+    if (c.userId && c.image) {
+      senderImageMap[c.userId.toString()] = c.image;
+    }
+  });
+
+  const showOverlay = (isMobile && chatListOpen) || (panelDrawer && !!detailUser);
+
+  // ── Render ─────────────────────────────────────────────────
   return (
     <div className="chat-page">
 
@@ -127,12 +317,10 @@ const Chat = () => {
               </svg>
             </button>
             <button className="chat-navbar__profile" onClick={handleProfileClick}>
-              <div className="chat-navbar__avatar" style={{ background: CURRENT_USER.color }}>
-                {getInitials(CURRENT_USER.name)}
-              </div>
+              <Avatar name={CURRENT_USER.name} image={null} size={30} className="chat-navbar__avatar" />
               <div className="chat-navbar__profile-info">
                 <div className="chat-navbar__profile-name">{CURRENT_USER.name}</div>
-                <div className="chat-navbar__profile-role">Manager</div>
+                <div className="chat-navbar__profile-role">{CURRENT_USER.username || 'User'}</div>
               </div>
               <svg className="chat-navbar__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
@@ -144,7 +332,6 @@ const Chat = () => {
         {/* Body */}
         <div className="chat-body">
 
-          {/* Shared dim overlay for both drawers on mobile */}
           {showOverlay && (
             <div className="chat-list-overlay" onClick={closeAllDrawers} />
           )}
@@ -154,7 +341,7 @@ const Chat = () => {
             <div className="chat-list-panel__header">
               <div className="chat-list-panel__title-row">
                 <h2 className="chat-list-panel__title">Chat</h2>
-                <button className="chat-list-panel__icon-btn" aria-label="Search chats">
+                <button className="chat-list-panel__icon-btn" aria-label="Search">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                   </svg>
@@ -167,22 +354,37 @@ const Chat = () => {
             </div>
 
             <div className="chat-list-panel__list">
-              {list.map(item => (
+              {convsLoading && (
+                <div className="chat-list__state">Loading...</div>
+              )}
+              {!convsLoading && convsError && (
+                <div className="chat-list__state chat-list__state--error">{convsError}</div>
+              )}
+              {!convsLoading && !convsError && list.length === 0 && (
+                <div className="chat-list__state">
+                  {activeTab === 'chats' ? 'No contacts yet. Add one!' : 'No groups yet. Create one!'}
+                </div>
+              )}
+              {!convsLoading && list.map(conv => (
                 <div
-                  key={item.id}
-                  className={`chat-item${activeContact?.id === item.id ? ' chat-item--active' : ''}`}
-                  onClick={() => handleContactClick(item)}
+                  key={conv.conversationId}
+                  className={`chat-item${activeConv?.conversationId === conv.conversationId ? ' chat-item--active' : ''}`}
+                  onClick={() => handleConvClick(conv)}
                 >
                   <div className="chat-item__avatar-wrap">
-                    <div className="chat-item__avatar-circle" style={{ background: item.color }}>
-                      {item.isGroup ? item.initials : getInitials(item.name)}
-                    </div>
-                    {item.online && <span className="chat-item__online-dot" />}
+                    <Avatar name={conv.name} image={conv.image} size={36} />
                   </div>
                   <div className="chat-item__info">
-                    <div className="chat-item__name">{item.name}</div>
-                    <div className="chat-item__preview">Lorem ipsum dolor sit amet dolor</div>
+                    <div className="chat-item__name">{conv.name}</div>
+                    <div className="chat-item__preview">
+                      {conv.isGroup ? (conv.description || 'Group chat') : (conv.email || conv.username || '')}
+                    </div>
                   </div>
+                  {conv.unreadCount > 0 && (
+                    <span className="chat-item__badge">
+                      {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -200,14 +402,24 @@ const Chat = () => {
 
           {/* Message area */}
           <div className="message-area">
+
+            {/* Header */}
             <div className="message-area__header">
-              <div className="message-area__header-avatar" style={{ background: activeContact?.color || '#6366F1' }}>
-                {activeContact ? getInitials(activeContact.name) : '?'}
-              </div>
-              <div className="message-area__header-info">
-                <div className="message-area__header-name">{activeContact?.name || 'Select a chat'}</div>
-                <div className="message-area__header-status">{activeContact?.online ? 'Online 3 minutes ago' : 'Offline'}</div>
-              </div>
+              {activeConv ? (
+                <>
+                  <Avatar name={activeConv.name} image={activeConv.image} size={32} className="message-area__header-avatar" />
+                  <div className="message-area__header-info">
+                    <div className="message-area__header-name">{activeConv.name}</div>
+                    <div className="message-area__header-status">
+                      {activeConv.isGroup ? `${activeConv.members?.length || 0} members` : activeConv.email || ''}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="message-area__header-info">
+                  <div className="message-area__header-name">Select a conversation</div>
+                </div>
+              )}
               <div className="message-area__header-actions">
                 <button className="message-area__header-btn">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -227,42 +439,73 @@ const Chat = () => {
               </div>
             </div>
 
+            {/* Messages */}
             <div className="message-area__messages">
-              {MESSAGES.map(msg => (
-                <div key={msg.id} className={`message${msg.sent ? ' message--sent' : ' message--received'}`}>
-                  {!msg.sent && (
-                    <div className="message__avatar" style={{ background: activeContact?.color || '#6366F1' }}>
-                      {activeContact ? getInitials(activeContact.name) : '?'}
-                    </div>
-                  )}
-                  <div className="message__content">
-                    <div className="message__bubble">{msg.text}</div>
-                    <div className="message__time">{msg.time}</div>
-                  </div>
-                  {msg.sent && (
-                    <div className="message__avatar" style={{ background: CURRENT_USER.color }}>
-                      {getInitials(CURRENT_USER.name)}
-                    </div>
-                  )}
+              {!activeConv && (
+                <div className="message-area__empty">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 48, height: 48, color: '#CBD5E1', marginBottom: 12 }}>
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <p>Select a conversation to start chatting</p>
                 </div>
-              ))}
+              )}
+
+              {activeConv && msgsLoading && (
+                <div className="message-area__empty">Loading messages...</div>
+              )}
+
+              {activeConv && !msgsLoading && messages.length === 0 && (
+                <div className="message-area__empty">No messages yet. Say hello!</div>
+              )}
+
+              {activeConv && !msgsLoading && messages.map(msg => {
+                // senderId is populated object { _id, name } or plain string fallback
+                const senderIdStr = msg.senderId?._id?.toString() || msg.senderId?.toString();
+                const isSent      = senderIdStr === CURRENT_USER.id?.toString();
+                const senderName  = msg.senderId?.name || activeConv.name;
+                // Use sender's own image, or look up from direct conversations map
+                const senderImage = msg.senderId?.image
+                  || senderImageMap[msg.senderId?._id?.toString()]
+                  || null;
+
+                return (
+                  <div key={msg._id} className={`message${isSent ? ' message--sent' : ' message--received'}`}>
+                    {!isSent && (
+                      <Avatar name={senderName} image={senderImage} size={26} className="message__avatar" />
+                    )}
+                    <div className="message__content">
+                      {activeConv.isGroup && !isSent && (
+                        <span className="message__sender-name">{senderName}</span>
+                      )}
+                      <div className="message__bubble">{msg.text}</div>
+                      <div className="message__time">{formatTime(msg.createdAt)}</div>
+                    </div>
+                    {isSent && (
+                      <Avatar name={CURRENT_USER.name} image={null} size={26} className="message__avatar" />
+                    )}
+                  </div>
+                );
+              })}
+
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* Input bar — attach btn is OUTSIDE the input field */}
+            {/* Input bar */}
             <div className="message-area__input-bar">
               <input
                 className="message-area__input"
-                placeholder="Type your message..."
+                placeholder={activeConv ? 'Type your message...' : 'Select a conversation first'}
                 value={messageInput}
                 onChange={e => setMessageInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
+                disabled={!activeConv}
               />
-              <button className="message-area__action-btn" aria-label="Attach file">
+              <button className="message-area__action-btn" aria-label="Attach file" disabled={!activeConv}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                 </svg>
               </button>
-              <button className="message-area__send-btn" onClick={handleSend} aria-label="Send">
+              <button className="message-area__send-btn" onClick={handleSend} aria-label="Send" disabled={!activeConv}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                 </svg>
@@ -270,11 +513,11 @@ const Chat = () => {
             </div>
           </div>
 
-          {/* User detail panel — gets --open class on mobile */}
+          {/* User detail panel */}
           {detailUser && (
             <UserDetailPanel
               user={detailUser}
-              isMobile={isMobile}
+              isMobile={panelDrawer}
               onClose={() => setDetailUser(null)}
             />
           )}
@@ -282,7 +525,7 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* FAB — opens chat list drawer on mobile */}
+      {/* FAB */}
       <button
         className="chat-list-fab"
         onClick={() => setChatListOpen(v => !v)}
@@ -300,10 +543,16 @@ const Chat = () => {
       </button>
 
       {showNewContact && (
-        <NewContactModal onClose={() => setShowNewContact(false)} onSubmit={(d) => console.log(d)} />
+        <NewContactModal
+          onClose={() => setShowNewContact(false)}
+          onSubmit={handleNewContact}
+        />
       )}
       {showNewGroup && (
-        <NewGroupModal onClose={() => setShowNewGroup(false)} onSubmit={(d) => console.log(d)} />
+        <NewGroupModal
+          onClose={() => setShowNewGroup(false)}
+          onSubmit={handleNewGroup}
+        />
       )}
 
     </div>

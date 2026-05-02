@@ -651,3 +651,62 @@
 .message-area__send-btn {
   flex-shrink: 0;
 }
+
+/* ── Empty / loading states ── */
+.chat-list__state {
+  padding: 1.5rem 1rem;
+  font-size: 0.8rem;
+  color: #94A3B8;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.chat-list__state--error { color: #EF4444; }
+
+.message-area__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #94A3B8;
+  text-align: center;
+  padding: 2rem;
+  gap: 0.5rem;
+}
+
+/* Avatar images rendered by the Avatar component */
+img.message-area__header-avatar,
+img.message__avatar,
+img.chat-navbar__avatar {
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Sender name above message bubble in group chats */
+.message__sender-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748B;
+  padding: 0 0.25rem 2px;
+  display: block;
+}
+
+/* ── Unread badge ── */
+.chat-item__badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: #EF4444;
+  color: #FFFFFF;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
