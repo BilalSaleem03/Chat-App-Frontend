@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './AuthLayout.css';
+import LeftImage from '/src/assets/Left.png';
 
 const AuthLayout = ({ children, footer }) => (
   <div className="auth-layout">
@@ -16,7 +17,7 @@ const AuthLayout = ({ children, footer }) => (
           <img src="/src/assets/app-mockup.png" alt="Tasky app preview" />
         </div>
       </div> */}
-      <img src="/src/assets/Left.png" alt="Tasky app preview" />
+      <img src={LeftImage} alt="Tasky app preview" />
     </aside>
     <main className="auth-layout__form">
       <div className="auth-layout__form-inner">
