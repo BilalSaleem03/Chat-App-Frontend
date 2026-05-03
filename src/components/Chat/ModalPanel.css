@@ -89,10 +89,11 @@
 
 /* Field */
 .modal-panel__field {
-  min-height:64px;
+  /* min-height:64px; */
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  /* height:auto; */
 }
 /* .modal-panel__field > div {
   height:72px;
@@ -108,7 +109,7 @@
 }
 
 .modal-panel__input {
-  height: 42px;
+  height: 40px;
   padding: 0 0.875rem;
   font-size: 0.9rem;
   font-family: 'DM Sans', sans-serif;
@@ -127,6 +128,10 @@
 
 .modal-panel__input::placeholder { color: #CBD5E1; }
 
+/* .model-panel__field-textbox{
+  height:100px;
+} */
+
 .modal-panel__textarea {
   padding: 0.75rem 0.875rem;
   font-size: 0.9rem;
@@ -137,9 +142,9 @@
   border-radius: 13px;
   outline: none;
   resize: none;
-  height: 80px;
+  /* min-height: 90px; */
   transition: border-color 150ms ease, box-shadow 150ms ease;
-  min-height: 156px;
+  height: 156px;
 }
 
 .modal-panel__textarea:focus {
@@ -151,15 +156,15 @@
 
 /* Image upload row */
 .modal-panel__image-row {
-  height:64px;
+  height:60px;
   display: flex;
   align-items: center;
   gap: 0.875rem;
 }
 
 .modal-panel__image-btn {
-  width: 64px;
-  height: 64px;
+  width: 57px;
+  height: 57px;
   border-radius: 50%;
   background: #F1F5F9;
   border: 0.1px solid #F1F5F9;
@@ -168,7 +173,7 @@
   justify-content: center;
   cursor: pointer;
   color: #64748B;
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight:10;
   transition: background 150ms ease;
   flex-shrink: 0;
@@ -177,7 +182,7 @@
 .modal-panel__image-btn:hover { background: #E2E8F0; }
 
 .modal-panel__image-select {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 500;
   text-decoration: underline;
   color: var(--color-primary);

@@ -116,7 +116,7 @@ const NewGroupModal = ({ onClose, onSubmit }) => {
           </div>
 
           {/* Description */}
-          <div className="modal-panel__field">
+          <div className="modal-panel__field model-panel__field-textbox">
             <label className="modal-panel__label" htmlFor="ng-desc">Description</label>
             <textarea
               className="modal-panel__textarea"

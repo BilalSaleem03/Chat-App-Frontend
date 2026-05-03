@@ -22,13 +22,13 @@ const getInitials  = (name) => name?.split(' ').map(w => w[0]).join('').slice(0,
 const getColor     = (name) => COLORS[(name?.charCodeAt(0) || 0) % COLORS.length];
 
 // Renders image if available, otherwise colored initials circle
-const Avatar = ({ name, image, size = 36, className = '' }) => {
+const Avatar = ({ name, image, size = 36, fontSize = 36 , className = '' }) => {
   const style = { width: size, height: size, borderRadius: '50%', flexShrink: 0, objectFit: 'cover' };
   if (image) {
     return <img src={image} alt={name} style={style} className={className} />;
   }
   return (
-    <div style={{ ...style, background: getColor(name), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.28 + 'px', fontWeight: 700, color: '#fff' }} className={className}>
+    <div style={{ ...style, background: getColor(name), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: fontSize + 'px', fontWeight: 700, color: '#fff' }} className={className}>
       {getInitials(name)}
     </div>
   );
@@ -56,6 +56,7 @@ const Chat = () => {
     name:          authUser?.name     || 'You',
     username:      authUser?.username || '',
     email:         authUser?.email    || '',
+    image:         authUser?.image,    
     color:         getColor(authUser?.name),
     isCurrentUser: true,
   };
@@ -339,7 +340,7 @@ const Chat = () => {
               <div style={{width: '1.5px', height: '34px' , backgroundColor:'var(--grey-lght)'}}> </div>
             </button>
             <button className="chat-navbar__profile" onClick={handleProfileClick}>
-              <Avatar name={CURRENT_USER.name} image={null} size={30} className="chat-navbar__avatar" />
+              <Avatar name={CURRENT_USER.name} image={CURRENT_USER?.image} size={32} fontSize={15} className="chat-navbar__avatar" />
               <div className="chat-navbar__profile-info">
                 <div className="chat-navbar__profile-name">{CURRENT_USER.name}</div>
                 <div className="chat-navbar__profile-role">{CURRENT_USER.username || 'User'}</div>
@@ -396,7 +397,7 @@ const Chat = () => {
                   onClick={() => handleConvClick(conv)}
                 >
                   <div className="chat-item__avatar-wrap">
-                    <Avatar name={conv.name} image={conv.image} size={36} />
+                    <Avatar name={conv.name} image={conv.image} size={40} fontSize={15} />
                   </div>
                   <div className="chat-item__info">
                     <div className="chat-item__name">{conv.name}</div>
@@ -432,7 +433,7 @@ const Chat = () => {
             <div className="message-area__header">
               {activeConv ? (
                 <>
-                  <Avatar name={activeConv.name} image={activeConv.image} size={32} className="message-area__header-avatar" />
+                  <Avatar name={activeConv.name} image={activeConv.image} size={40} fontSize={15} className="message-area__header-avatar" />
                   <div className="message-area__header-info">
                     <div className="message-area__header-name">{activeConv.name}</div>
                     <div className="message-area__header-status">
@@ -442,7 +443,7 @@ const Chat = () => {
                 </>
               ) : (
                 <div className="message-area__header-info">
-                  <div className="message-area__header-name">Select a conversation</div>
+                  <div className="message-area__header-name message-area__header-name-no-convo-selected">Select a conversation</div>
                 </div>
               )}
               <div className="message-area__header-actions">
@@ -498,11 +499,11 @@ const Chat = () => {
                     
                     <div className="message__content">
                         {!isSent && (
-                        <Avatar name={senderName} image={senderImage} size={26} className="message__avatar" />
+                        <Avatar name={senderName} image={senderImage} size={26} fontSize={15} className="message__avatar" />
                         )}
                         <div className="message__bubble">{msg.text}</div>
                         {isSent && (
-                            <Avatar name={CURRENT_USER.name} image={null} size={26} className="message__avatar" />
+                            <Avatar name={CURRENT_USER.name} image={CURRENT_USER?.image} size={26} fontSize={15} className="message__avatar" />
                         )}
                       {activeConv.isGroup && !isSent && (
                         <span className="message__sender-name">{senderName}</span>

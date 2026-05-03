@@ -87,17 +87,20 @@ html {
 }
 
 #root {
-  max-width: 2000px;
+    /* width:100%; */
+  max-width: 1600px;
   margin: 0 auto;
+
 }
 
 body {
-  font-family: var(--font);
-  font-weight: var(--fw-regular);
-  color: #0F172A;                        /* explicit fallback */
-  background-color: #FFFFFF;            /* explicit fallback */
-  line-height: 1.5;
-  min-height: 100vh;
+    font-family: var(--font);
+    font-weight: var(--fw-regular);
+    color: #0F172A;                        /* explicit fallback */
+    background-color: #FFFFFF;            /* explicit fallback */
+    line-height: 1.5;
+    min-height: 100vh;
+    /* margin: 0 auto; */
 }
 
 a {

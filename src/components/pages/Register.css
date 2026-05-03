@@ -262,6 +262,11 @@
   text-decoration: underline;
 }
 
+.auth-layout__footer{
+    color: var(--grey-grey-500);
+    
+}
+
 /* ── Responsive ── */
 @media (max-width: 480px) {
   .register__row { grid-template-columns: 1fr; }

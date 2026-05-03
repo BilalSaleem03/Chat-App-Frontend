@@ -52,7 +52,7 @@ const UserDetailPanel = ({ user, isMobile, onClose }) => {
     return (
       <div
         className="user-detail-panel__avatar"
-        style={{ background: getColor(user.name) }}
+        style={{ background: getColor(user.name) , fontSize:"50px"}}
       >
         {getInitials(user.name)}
       </div>

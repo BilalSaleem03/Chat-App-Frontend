@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../Auth/AuthLayout.jsx';
 import './ForgotPassword.css';
+import heart from "../../assets/heart.svg";
 
 // ── Step 1: Enter email ───────────────────────────────────────
 const ForgotPasswordForm = () => {
@@ -27,7 +28,21 @@ const ForgotPasswordForm = () => {
   };
 
   return (
-    <AuthLayout footer="© 2024 Made With ♥ By Sugab">
+    <AuthLayout 
+    footer={
+        <div className="auth-footer">
+          <span>© 2024 Made With</span>
+
+          <img
+            src={heart}
+            alt="heart"
+            className="auth-footer__heart"
+          />
+
+          <span>By Sugab</span>
+        </div>
+      }
+    >
       <div className="forgot">
         <div>
           <h1 className="forgot__title">Forgot Password</h1>

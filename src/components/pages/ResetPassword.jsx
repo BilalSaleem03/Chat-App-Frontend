@@ -5,6 +5,7 @@ import AuthLayout from '../Auth/AuthLayout.jsx';
 import './ForgotPassword.css';
 import eyeOff from "../../assets/eye-off.svg"
 import eye from "../../assets/eye.svg"
+import heart from "../../assets/heart.svg";
 
 
 const API = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
@@ -60,7 +61,21 @@ const ResetPassword = () => {
   };
 
   return (
-    <AuthLayout footer="© 2024 Made With ♥ By Sugab">
+    <AuthLayout 
+    footer={
+        <div className="auth-footer">
+            <span>© 2024 Made With</span>
+
+            <img
+            src={heart}
+            alt="heart"
+            className="auth-footer__heart"
+            />
+
+            <span>By Sugab</span>
+        </div>
+        }
+    >
       <div className="reset">
         <div>
           <h1 className="reset__title">Reset Password</h1>
